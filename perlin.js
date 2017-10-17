@@ -7,11 +7,7 @@ var canvas = document.querySelector('#myCanvas'),
     lastCoord = [],
     simplex = new SimplexNoise(),
     value2d = 0,
-    fps = 10,
-    now,
-    then = Date.now(),
-    interval = 1000/fps,
-    delta;
+    time = 0,
     x = 0,
     y = 0;
 
@@ -43,8 +39,8 @@ class Point {
     ctx.beginPath();
     ctx.save();
 
-    ctx.fillStyle = getRandomColor();
-    ctx.strokeStyle = getRandomColor();
+    ctx.fillStyle = '#000';
+    ctx.strokeStyle = '#000';
 
 
     ctx.translate(canvasWidth/2, canvasHeight/2);
@@ -62,11 +58,12 @@ class Point {
       x: this.x,
       y: this.y
     }
-    this.frame()
   }
   frame() {
-    value2d = simplex.noise2D(this.x, this.y) * 20;
-
+    time += 0.000025;
+    value2d = simplex.noise2D(Math.cos(this.angle) + time, Math.sin(this.angle) + time) * 50;
+    this.x = Math.cos(this.angle) * (this.radius + value2d);
+    this.y = Math.sin(this.angle) * (this.radius + value2d);
   }
 }
 
@@ -74,20 +71,18 @@ update()
 
 function update() {
 
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
   requestAnimationFrame( update );
 
-  now = Date.now();
-  delta = now - then;
+  for (var i = 0; i < points.length; i++) {
+    points[i].frame();
+    points[i].draw();
+  }
+}
 
-    if (delta > interval) {
-      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-      for (var i = 0; i <Math.PI*2; i+=0.05) {
-        angle += 0.05; // augmenter du même angle pour un cercle parfait
-        var point = new Point(angle, value2d); // on créé un nouvel objet Point
-        point.draw(); // on dessine le nouvel objet Point grâce à la méthode draw()
-        points.push(point); // on pousse dans le tableau Points, chaque point créé
-      }
-        then = now - (delta % interval);
-    }
-
+for (var i = 0; i <Math.PI*2; i+=0.05) {
+  angle += 0.05; // augmenter du même angle pour un cercle parfait
+  var point = new Point(angle, value2d); // on créé un nouvel objet Point
+  points.push(point); // on pousse dans le tableau Points, chaque point créé
 }
