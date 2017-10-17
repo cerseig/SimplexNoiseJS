@@ -7,11 +7,11 @@ var canvas = document.querySelector('#myCanvas'),
     lastCoord = [],
     simplex = new SimplexNoise(),
     value2d = 0,
-    fps = 60,
+    fps = 10,
     now,
-    date = Date.now(),
-    interval = 1000/fps
-    deltaTime = 0,
+    then = Date.now(),
+    interval = 1000/fps,
+    delta;
     x = 0,
     y = 0;
 
@@ -73,16 +73,21 @@ class Point {
 update()
 
 function update() {
-  
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
-  requestAnimationFrame( update )
+  requestAnimationFrame( update );
 
-  for (var i = 0; i <Math.PI*2; i+=0.05) {
-    angle += 0.05; // augmenter du même angle pour un cercle parfait
-    var point = new Point(angle, value2d); // on créé un nouvel objet Point
-    point.draw(); // on dessine le nouvel objet Point grâce à la méthode draw()
-    points.push(point); // on pousse dans le tableau Points, chaque point créé
-  }
+  now = Date.now();
+  delta = now - then;
+
+    if (delta > interval) {
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      for (var i = 0; i <Math.PI*2; i+=0.05) {
+        angle += 0.05; // augmenter du même angle pour un cercle parfait
+        var point = new Point(angle, value2d); // on créé un nouvel objet Point
+        point.draw(); // on dessine le nouvel objet Point grâce à la méthode draw()
+        points.push(point); // on pousse dans le tableau Points, chaque point créé
+      }
+        then = now - (delta % interval);
+    }
 
 }
